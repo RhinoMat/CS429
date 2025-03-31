@@ -2753,9 +2753,5 @@ int G_display_bmp_file (char filename[], int xoffset, int yoffset)
   return 1 ;
 }
 
-
-
-
-
 #endif
 
