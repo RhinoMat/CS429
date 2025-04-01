@@ -50,11 +50,28 @@ cc  FPToolkitDemoB.c   -lm  -lX11
 
 NOTE: The 'X' in -lX11 is capitalized
 */
-
+// basing one design off of https://www.youtube.com/watch?v=ObWzvqknX2A @ 4:01
 
 #include  "FPToolkit.c"
 
+int main()
+{
+    int swidth, sheight;
+    double lowleftx, lowlefty, width, height;
 
+    swidth = 910; sheight = 520;
+    G_init_graphics(swidth, sheight);
+
+    G_rgb(219.0/255, 220.0/255, 211.0/255);
+    G_clear();
+
+    int key ;   
+    key =  G_wait_key() ; // pause so user can see results
+
+    G_save_to_bmp_file("demo.bmp") ;
+}
+
+/*
 int main()
 {
    int    swidth, sheight ;
@@ -147,3 +164,4 @@ int main()
    //G_save_image_to_file("demo.xwd") ;
    G_save_to_bmp_file("demo.bmp") ;
 }
+*/
