@@ -41,3 +41,9 @@
 * at least 1 from each paradigm
 * at least 1 that is not from the given set
 * Due 6/12/25
+
+## FPToolkit Junk
+
+* (0, 0) is bottom left corner
+* Color for RGB is color_coord / 255
+* no RGBA

@@ -17,6 +17,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+
 /*
 This version (100) fixed a memory leak in
 Get_Image_From_File_X  (thanks to Casey Yamamura)
@@ -29,6 +30,8 @@ an int if the function was declared to do so
 // version should work in repl...the key
 // was to eliminate calls to XSetFont and
 // open the display with "MAGIC" instad of "\0"
+
+
 					    
 /* Version 101 :					    
 
@@ -40,6 +43,7 @@ an int if the function was declared to do so
    int G_save_to_bmp_file (char *fname)
 
 */
+
 					    
 /*  Version 102 ;
   Fixes a clipping bug in
@@ -50,6 +54,7 @@ an int if the function was declared to do so
   leaving a residue at the left
   or right boundaries.
 */
+
 					    
 /*  Version 103 :
   Support for reading an existing bmp file and displaying it :
@@ -60,6 +65,7 @@ an int if the function was declared to do so
   int G_display_bmp_file (char filename[], int xoffset, int yoffset)
   // return 0 if failure, else return 1  
 */
+
 
 /* Version 104 :
   G_resize_window 
@@ -72,10 +78,14 @@ an int if the function was declared to do so
   G_choose_repl_display()
   has also been eliminated
   since repl changed its behavior
-*/					    
+*/
+
+
+					    
 
 #ifndef FPT876PBNM3521
 #define FPT876PBNM3521
+
 
 #include <stdio.h>
 #include <math.h>
@@ -85,8 +95,13 @@ an int if the function was declared to do so
 #include <sys/time.h> 
 #include <string.h> // for strlen
 
+
+
+
+
 //====================================================================
 // X stuff :
+
 
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -94,6 +109,7 @@ an int if the function was declared to do so
 #include <X11/Xutil.h>// for XComposeStatus
 
 int Set_Color_Rgb_X (int r, int g, int b) ;
+
 
 typedef XImage *XImagePointer ;
 static int Xx_Win_width ;
@@ -124,7 +140,11 @@ static int Current_Blue_Int ;
 static unsigned long int Current_Color_Pixel ;
 static unsigned long int Last_Clear_Buffer_Pixel ;
 
+
+
+
 //////////////////////////////////////////////////////////////
+
 
 static int Display_Code = 100 ; // default on linux systems
 
@@ -139,6 +159,12 @@ int G_choose_repl_display()
 
 //////////////////////////////////////////////////////////////
 
+
+
+
+
+
+
 int Clear_Buffer_X() 
 {
    unsigned long int p ;
@@ -150,14 +176,25 @@ int Clear_Buffer_X()
    return 1 ;
 }
 
+
+
+
 int Copy_Buffer_X()
 {
    XCopyArea(XxDisplay, XxPixmap, XxWindow, XxWindowContext,
 	     0, Xx_Pix_height - Xx_Win_height,
              Xx_Win_width, Xx_Win_height,
              0,0) ;
-   return 1 ;			
+   return 1 ;
+			
 }
+
+
+
+
+
+
+
 
 int Init_X (double Dswidth, double Dsheight)
 {
@@ -180,6 +217,10 @@ int Init_X (double Dswidth, double Dsheight)
         exit(0) ;
     }
 
+
+    
+    
+    
     XxRootWindow = DefaultRootWindow(XxDisplay);
     XxScreenNumber = DefaultScreen(XxDisplay); 
     XxDepth = DefaultDepth(XxDisplay, XxScreenNumber);
@@ -188,6 +229,7 @@ int Init_X (double Dswidth, double Dsheight)
       printf("Color function not likely to work.\n") ;
       return 0 ;
     }
+
 
     ///////////////////////////////////////////////////////////////////
 
@@ -210,6 +252,7 @@ int Init_X (double Dswidth, double Dsheight)
       Xx_Win_width = maxwidth ;
     } 
 
+
     if (sheight > maxheight) {
       printf("Requested height of %d exceeds max allowable of %d.\n",
 	     sheight,maxheight) ;
@@ -222,10 +265,13 @@ int Init_X (double Dswidth, double Dsheight)
 
     ///////////////////////////////////////////////////////////////////
 
+
     XxWindow = XCreateSimpleWindow(XxDisplay, XxRootWindow,
                         0, 0, Xx_Win_width, Xx_Win_height, 0, 0, 0);
 
     if (!XxWindow) return 0 ;
+
+
 
     XxPixmap = XCreatePixmap(XxDisplay, XxRootWindow,
                               Xx_Pix_width, Xx_Pix_height, XxDepth);
@@ -234,6 +280,7 @@ int Init_X (double Dswidth, double Dsheight)
 
     XxDrawable = XxPixmap;
 
+
     XMapWindow(XxDisplay, XxWindow);
     XSelectInput(XxDisplay, XxWindow, ExposureMask |
 					StructureNotifyMask |
@@ -241,15 +288,20 @@ int Init_X (double Dswidth, double Dsheight)
 					ButtonPressMask |
 					KeyPressMask );
 
+
     vals.graphics_exposures = 0; // False
     XxWindowContext = XCreateGC(XxDisplay, XxWindow,
                                  GCGraphicsExposures, &vals);
     if (!XxWindowContext) return 0;
 
+
+
     XxPixmapContext = XCreateGC(XxDisplay, XxPixmap, 0, 0);
     if (!XxPixmapContext) return 0;
 
+
     XxColormap = DefaultColormap(XxDisplay, XxScreenNumber);
+
 
     XxFontInfo = XLoadQueryFont(XxDisplay, XxFont) ;
     //    XSetFont(XxDisplay, XxWindowContext, XxFontInfo->fid) ;
@@ -258,8 +310,10 @@ int Init_X (double Dswidth, double Dsheight)
     // probably no need to really do this
     // and it creates a hassle for repl and other
     // environments
+
     
     XClearArea(XxDisplay, XxWindow, 0,0,0,0,True); 
+
     
     // most people expect a white piece of paper
     // with a black pencil
@@ -269,11 +323,15 @@ int Init_X (double Dswidth, double Dsheight)
 
     Copy_Buffer_X() ;
 
+
     XFlush(XxDisplay);  
+
 
     Set_Color_Rgb_X (0,0,0) ; // black pencil
     return 1 ;
 }
+
+
 
 int Close_Down_X()
 {
@@ -286,6 +344,8 @@ int Close_Down_X()
     return 1 ;    
 }
 
+
+
 int Copy_Buffer_And_Flush_X()
 {
    Copy_Buffer_X() ;
@@ -294,6 +354,8 @@ int Copy_Buffer_And_Flush_X()
 
    return 1 ;   
 }
+
+
 
 int Send_Expose_Event()
 {
@@ -307,6 +369,8 @@ int Send_Expose_Event()
 
   return 1 ;  
 }
+
+
 
 int Handle_Events_X(int *px, int *py)
 {
@@ -323,7 +387,10 @@ int Handle_Events_X(int *px, int *py)
     int request[2],sig ;
 
     // printf("enter Handle_Events_X\n") ;
+
+
  MORE_EVENTS : 
+
     if ( !(XPending(XxDisplay)) ) {
       retval = -3000 ;
       goto LLL ;
@@ -335,10 +402,15 @@ int Handle_Events_X(int *px, int *py)
       // Since we don't want it to block when the queue is empty
       // we check beforehand with XPending to see if there
       // is anything in the queue
+
     // printf("event.type == %d\n",event.type) ;
+
     switch(event.type) {
+
+
     case Expose:
         // printf("Expose\n") ;
+
         Copy_Buffer_And_Flush_X() ;
              // this is new ... when the window is uncovered
 	     // this will regenerate it from the buffer
@@ -346,6 +418,7 @@ int Handle_Events_X(int *px, int *py)
         retval = -1 ; 
         goto LLL ;
 	break;	
+
 
     case MotionNotify:
         // printf("MotionNotify\n") ;
@@ -377,6 +450,7 @@ int Handle_Events_X(int *px, int *py)
         goto LLL ;
 	break;
 
+
     case ButtonPress:
         // printf("ButtonPress\n") ;
         // while this gives coords relative to the upper left
@@ -394,6 +468,8 @@ int Handle_Events_X(int *px, int *py)
         goto LLL ;
 	break;
 
+
+
     case ConfigureNotify:
         // printf("ConfigureNotify\n") ;
         // check for window resizing
@@ -405,6 +481,7 @@ int Handle_Events_X(int *px, int *py)
         goto LLL ;
 	break;		
 
+
     case KeyPress:
         // printf("KeyPress\n") ;
         XLookupString (&(event.xkey), buffer, bufsize, &keysym, &compose) ;
@@ -413,7 +490,8 @@ int Handle_Events_X(int *px, int *py)
         goto LLL ;
 	break;
 
-  default:
+
+    default:
       // printf("default\n") ;
 	*px = 0 ; *py = 0 ;
         retval = -1000 ;
@@ -421,6 +499,9 @@ int Handle_Events_X(int *px, int *py)
 	break;
 
     }
+
+
+
 
     // printf("none of the above\n") ;
     *px = 0 ; *py = 0 ;
@@ -433,10 +514,19 @@ int Handle_Events_X(int *px, int *py)
     // placed on the display event queue because
     // of the way Init_X has set things up with
     // XSelectInput(...
+
+
  LLL : ;
+
     // printf("exit Handle_Events_X\n") ;
     return retval ;
 }
+
+
+
+
+
+
 
 int Get_Events_X (int *d)
 // d needs to point to 2 or more ints
@@ -450,6 +540,7 @@ int Get_Events_X (int *d)
   return s ;
 }
 
+
 int Get_Events_DX (double *d)
 // d needs to point to 2 or more doubles
 // merely repackages Handle_Events_X
@@ -462,9 +553,17 @@ int Get_Events_DX (double *d)
   return s ;
 }
 
+
+
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 
 int Point_X (double Dx, double Dy) 
 {
@@ -478,6 +577,9 @@ int Point_X (double Dx, double Dy)
   return 1 ;
 }
 
+
+
+
 int Safe_Point_X (double Dx, double Dy)
 {
   int x = (int)Dx ;
@@ -488,6 +590,10 @@ int Safe_Point_X (double Dx, double Dy)
                x,  Xx_Pix_height - 1 - y) ;
     return 1 ;
 }
+
+
+
+
 
 int Line_X (double Dxs, double Dys, double Dxe, double Dye)
 {
@@ -504,6 +610,11 @@ int Line_X (double Dxs, double Dys, double Dxe, double Dye)
   return 1 ;    
 }
 
+
+
+
+
+
 int Safe_Line_X (double Dxs, double Dys, double Dxe, double Dye)
 {
   int ixs = (int)Dxs ;
@@ -513,6 +624,7 @@ int Safe_Line_X (double Dxs, double Dys, double Dxe, double Dye)
 
   double xs, ys, xe, ye ; // doubles for accuracy in clipping 
   double t, xedge, yedge ;
+
 
   if (  (ixs >= 0 ) && (ixs < Xx_Pix_width)  
      && (ixe >= 0 ) && (ixe < Xx_Pix_width)  
@@ -527,6 +639,8 @@ int Safe_Line_X (double Dxs, double Dys, double Dxe, double Dye)
 
   }
 
+
+
   xs = ixs ; ys = iys ; xe = ixe ; ye = iye ;
 
 // start to end 
@@ -535,7 +649,10 @@ int Safe_Line_X (double Dxs, double Dys, double Dxe, double Dye)
 // out      in      replace start 
 // out     out      don't draw the line 
 
+
 // clip against all 4 sides of screen 
+
+
 
 // first clip against y = 0 
 
@@ -595,6 +712,7 @@ int Safe_Line_X (double Dxs, double Dys, double Dxe, double Dye)
      }
  }
 
+
 // third, clip against x = 0 
 
  xedge = 0 ;
@@ -616,6 +734,7 @@ int Safe_Line_X (double Dxs, double Dys, double Dxe, double Dye)
              // xe cannot be xs .. no div by 0 worry 
          ys = ys + t*(ye - ys) ;
          xs = xedge ;
+
      }
      else {
          // both are out...don't draw line at all 
@@ -652,15 +771,21 @@ int Safe_Line_X (double Dxs, double Dys, double Dxe, double Dye)
      }
  }
 
+
     XDrawLine (XxDisplay, XxDrawable, XxPixmapContext,
                (int)xs, (int)(Xx_Pix_height-1-ys),
                (int)xe, (int)(Xx_Pix_height-1-ye) );
+
 
  CLend : 
 
     return 1 ;
 
 }
+
+
+
+
 
 int Rectangle_X (double Dxlow, double Dylow, double Dwidth, double Dheight) 
 {
@@ -677,6 +802,9 @@ int Rectangle_X (double Dxlow, double Dylow, double Dwidth, double Dheight)
   return 1 ;  
 }
 
+
+
+
 int Fill_Rectangle_X (double Dxlow, double Dylow, double Dwidth, double Dheight) 
 {
   int xlow = (int)Dxlow ;
@@ -690,6 +818,8 @@ int Fill_Rectangle_X (double Dxlow, double Dylow, double Dwidth, double Dheight)
 
   return 1 ;  
 }
+
+
 
 int Triangle_X (double Dx1, double Dy1, 
                 double Dx2, double Dy2,
@@ -721,6 +851,10 @@ int Triangle_X (double Dx1, double Dy1,
   return 1 ;  
 }
 
+
+
+
+
 int Fill_Triangle_X (double Dx1, double Dy1, 
                      double Dx2, double Dy2,
                      double Dx3, double Dy3)
@@ -741,11 +875,16 @@ int Fill_Triangle_X (double Dx1, double Dy1,
   Points[2].x = (x3);
   Points[2].y = (Xx_Pix_height-1-y3);
 
+
   XFillPolygon(XxDisplay, XxDrawable, XxPixmapContext,
                 Points, 3, Convex, CoordModeOrigin);
 
   return 1 ;  
 }
+
+
+
+
 
 int Polygon_X (int *x, int *y, int npts)
 {
@@ -806,6 +945,8 @@ int Polygon_DX (double *x, double *y, double Dnpts)
    return 1 ;
 }
 
+
+
 int Fill_Polygon_X (int *x, int *y, int npts)
 {
    XPoint xpoint[1000] ;
@@ -825,12 +966,15 @@ int Fill_Polygon_X (int *x, int *y, int npts)
         xpoint[k].y = Xx_Pix_height -1 - y[k] ;
    }
 
+
    XFillPolygon(XxDisplay,XxDrawable,XxPixmapContext,
                 xpoint,npts,Nonconvex,CoordModeOrigin);   
 
    return 1 ;
 
 }
+
+
 
 int Fill_Polygon_DX (double *x, double *y, double Dnpts)
 {
@@ -856,8 +1000,12 @@ int Fill_Polygon_DX (double *x, double *y, double Dnpts)
    XFillPolygon(XxDisplay,XxDrawable,XxPixmapContext,
                 xpoint,npts,Nonconvex,CoordModeOrigin);   
 
+
    return 1 ;
 }
+
+
+
 
 int FLAWED_Horizontal_Single_Pixel_Line_X (double Dx0, double Dx1, double Dy)
 {
@@ -888,6 +1036,10 @@ int FLAWED_Horizontal_Single_Pixel_Line_X (double Dx0, double Dx1, double Dy)
    return 1 ;
 } 
 
+
+
+
+
 int Horizontal_Single_Pixel_Line_X (double Dx0, double Dx1, double Dy)
 {
    int x0 = (int)Dx0 ;
@@ -898,12 +1050,17 @@ int Horizontal_Single_Pixel_Line_X (double Dx0, double Dx1, double Dy)
    // protect against an offscreen line
    if (y < 0) return 0 ;
    if (y >= Xx_Pix_height) return 0 ;
+
    
    if (x0 > x1) { t = x1 ; x1 = x0 ; x0 = t ; } // now we know  x0 <= x1
+
+
    
    if (x1 < 0) return 0 ;
    if (x0 >= Xx_Pix_width) return 0 ;
       // now we know that x1 >= 0  and  x0 < Xx_Pix_width
+
+
    
    if (x0 < 0) x0 = 0 ; // this makes x0 STILL less than or equal to x1 because of above.
    if (x1 >= Xx_Pix_width) x1 = Xx_Pix_width - 1 ; // still guarantees x0 <= x1
@@ -918,6 +1075,11 @@ int Horizontal_Single_Pixel_Line_X (double Dx0, double Dx1, double Dy)
    
    return 1 ;
 } 
+
+
+
+
+
 
 int Circle_X (double Da, double Db, double Dr)
 {
@@ -953,6 +1115,12 @@ int Circle_X (double Da, double Db, double Dr)
   return 1 ; 
 } 
 
+
+
+
+
+
+
 int Fill_Circle_X (double Da, double Db, double Dr)
 {
  int a = (int)Da ;
@@ -987,15 +1155,22 @@ int Fill_Circle_X (double Da, double Db, double Dr)
   return 1 ; 
 } 
 
+
+
+
+
 int Font_Pixel_Height_X ()
 // Returns the height of the font in pixels. 
 {
      return XxFontInfo->max_bounds.ascent + XxFontInfo->max_bounds.descent;
 }
 
+
+
 // the void * delcarations below allow for the passing of
 // arrays of characters (usual usage) but also, for instance,
 // an array of doubles that is composed of packed characters
+
 
 int String_Pixel_Width_X (const void *s)
 // Returns the length, in pixels, of the string s 
@@ -1006,6 +1181,10 @@ int String_Pixel_Width_X (const void *s)
 
      return XTextWidth(XxFontInfo, (char *)s, len);
 }
+
+
+
+
 
 int Draw_String_X (const void *s, double Dx, double Dy)
 // Draw the string s, with the lower left hand corner at (x,y)
@@ -1024,12 +1203,16 @@ int Draw_String_X (const void *s, double Dx, double Dy)
   return 1 ;     
 }
 
+
+
+
 int Get_Current_Dimensions_X (int dimensions[2])
 {
   dimensions[0] = Xx_Pix_width ;
   dimensions[1] = Xx_Pix_height ;
   return 1 ;  
 }
+
 
 int Get_Current_Dimensions_DX (double dimensions[2]) 
 {
@@ -1038,11 +1221,14 @@ int Get_Current_Dimensions_DX (double dimensions[2])
   return 1 ;  
 }
 
+
 int Change_Pen_Dimensions_X (double Dw, double Dh)
 {
   printf("Change_Pen_Dimensions_X  not implemented\n") ;
   return 0 ;
 }
+
+
 
 int Draw_Text_X (
                int num_lines_of_text,
@@ -1058,9 +1244,12 @@ int Draw_Text_X (
   return 0 ;
 }
 
+
+
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+
 
 void fputintB (int x, FILE *fp)
 {
@@ -1080,6 +1269,9 @@ void fputintB (int x, FILE *fp)
 
 }
 
+
+
+
 int fgetintB (FILE *fp)
 {
    char *p ;
@@ -1091,6 +1283,8 @@ int fgetintB (FILE *fp)
         c[i] = fgetc(fp) ;
    }
 
+
+
    p = (char *) &x ;
 
    for (i = 0 ; i < 4 ; i++) {
@@ -1101,6 +1295,12 @@ int fgetintB (FILE *fp)
 
    return x ;
 }
+
+
+
+
+
+
 
 void  XImage_To_XWD_File (XImage *pxim,  FILE *fp)
 {
@@ -1190,16 +1390,29 @@ void  XImage_To_XWD_File (XImage *pxim,  FILE *fp)
  windowborderwidth = 0 ;
  fputintB(windowborderwidth,fp) ;
 
+
  // null terminated window name fleshed out to multiple of 4 bytes
  fputc('\0',fp) ;
  fputc('\0',fp) ;
  fputc('\0',fp) ;
  fputc('\0',fp) ;
 
+
  numbytestowrite =   bytes_per_line * height ;
 
  fwrite( pxim->data, numbytestowrite, 1, fp) ;
+
 }
+
+
+
+
+
+
+
+
+
+
 
 void XImage_From_XWD_File (XImage *pxim, FILE *fp)
 {
@@ -1216,6 +1429,7 @@ void XImage_From_XWD_File (XImage *pxim, FILE *fp)
  int width,height ;
 
  int c, numbytestoread ;
+
 
  header_size = fgetintB(fp) ;
  file_version = fgetintB(fp) ;
@@ -1260,9 +1474,12 @@ void XImage_From_XWD_File (XImage *pxim, FILE *fp)
  pxim->byte_order = byte_order ;
  pxim->bitmap_bit_order = bitmap_order ;
 
+
+
  /* on users head to have freed up any previous memory that pxim->data
     might have pointed to...trying to free it up here will cause faults
     if not already pointing to something sane */
+
 
  numbytestoread =   pxim->bytes_per_line * pxim->height  ;
  pxim->data = (char *)malloc(numbytestoread) ;
@@ -1275,7 +1492,12 @@ void XImage_From_XWD_File (XImage *pxim, FILE *fp)
  int aaa = fread (pxim->data, numbytestoread, 1, fp) ;
 
  rewind(fp) ;
+
 }
+
+
+
+
 
 int Save_Image_To_File_X (const void *filename)
 // return 1 if successful else 0
@@ -1304,6 +1526,10 @@ int Save_Image_To_File_X (const void *filename)
 
   return 1 ;
 }
+
+
+
+
 
 int Get_Image_From_File_X (const void *filename, double Dx, double Dy)
 // Put lower left corner of file into the graphics window at (x,y).
@@ -1351,10 +1577,12 @@ int Get_Image_From_File_X (const void *filename, double Dx, double Dy)
 
   }
 
+
   XPutImage (XxDisplay, XxDrawable, XxPixmapContext, &xim[0],
              srcx, srcy, destx, desty,
              transfer_width, transfer_height) ;
 	     //	     Xx_Pix_width, Xx_Pix_height) ;
+
 
   fclose(fp) ;
 
@@ -1363,6 +1591,9 @@ int Get_Image_From_File_X (const void *filename, double Dx, double Dy)
   
   return 1 ;
 }
+
+
+
 
 int Get_Image_Dimensions_From_File_X (int d[2], void *filename)
 // return 1 if successful else 0
@@ -1393,8 +1624,13 @@ int Get_Image_Dimensions_From_File_X (int d[2], void *filename)
  d[1] = height ;
 
  fclose(fp) ;
+
  return 1 ;
 }
+
+
+
+
 
 int Get_Pixel_X (double Dx, double Dy)
 // return the 32 bit pixel value...assumes x,y are legal
@@ -1415,6 +1651,8 @@ int Get_Pixel_X (double Dx, double Dy)
 
   return p ;
 }
+
+
 
 int Get_Pixel_SAFE_X (double Dx, double Dy, int pixel[1]) 
 // return 1 if successful, else 0
@@ -1437,6 +1675,9 @@ int Get_Pixel_SAFE_X (double Dx, double Dy, int pixel[1])
   return 1 ;
 }
 
+
+
+
 /////////////////////////////////////////////////////////////////
 // suppose there were just 4 colors, 0,1,2,3
 // [0.00, 0.25) -> 0
@@ -1447,6 +1688,8 @@ int Get_Pixel_SAFE_X (double Dx, double Dy, int pixel[1])
 // 1 -> middle of [0.25, 0.50)
 // 2 -> middle of [0.50, 0.75)
 // 3 -> middle of [0.75, 1.00)
+
+
 
 int Set_Color_Rgb_X (int r, int g, int b)
 {
@@ -1468,6 +1711,8 @@ int Set_Color_Rgb_X (int r, int g, int b)
   return 1 ;  
 }
 
+
+
 int Set_Color_Rgb_DX (double dr, double dg, double db)
 {
   int r,g,b ;
@@ -1485,6 +1730,9 @@ int Set_Color_Rgb_DX (double dr, double dg, double db)
   return 1 ;  
 }
 
+
+
+
 int Convert_Pixel_To_rgbI_X (int pixel, int rgbI[3]) 
 // rgbI[] values in 0-255
 // return 1 if successful, else 0
@@ -1494,6 +1742,7 @@ int Convert_Pixel_To_rgbI_X (int pixel, int rgbI[3])
   rgbI[0] = (pixel >> 16) & 0xff ;
   return 1 ;
 }
+
 
 int Convert_rgbI_To_rgb_X (int rgbI[3], double rgb[3]) 
 // convert rgbI[] in 0-255 to rgb[] in 0.0 - 1.0
@@ -1508,6 +1757,8 @@ int Convert_rgbI_To_rgb_X (int rgbI[3], double rgb[3])
 
   return 1 ;  
 }
+
+
 
 int XImage_to_Display (XImage *pxim, double Dx, double Dy)
 // Put lower left corner of file into the graphics window at (x,y).
@@ -1546,6 +1797,7 @@ int XImage_to_Display (XImage *pxim, double Dx, double Dy)
 
   }
 
+
   XPutImage (XxDisplay, XxDrawable, XxPixmapContext, pxim,
              srcx, srcy, destx, desty,
              transfer_width, transfer_height) ;
@@ -1553,6 +1805,8 @@ int XImage_to_Display (XImage *pxim, double Dx, double Dy)
 
   return 1 ;
 }
+
+
 
 XImagePointer Get_ximage_of_display()
 // should be used with caution...
@@ -1562,13 +1816,22 @@ XImagePointer Get_ximage_of_display()
 // when done with ximage or could create memory leak
 {
   XImage *pxim ;
+
   pxim = XGetImage (XxDisplay, XxDrawable, 0,0, Xx_Pix_width, Xx_Pix_height,
                       AllPlanes, ZPixmap) ;
+
   return pxim ;
 }
 
+
+
+
+
+
 //====================================================================
 // G stuff :
+
+
 
 /////////////////////////////////////////////////////////////////////
 // the G_ routines are graphics related and should
@@ -1583,15 +1846,19 @@ XImagePointer Get_ximage_of_display()
 int (* G_close) () ;
 // terminate the graphics
 
+
 int (* G_display_image) () ;
 // make drawing visible if it already isn't
 // in some environments, this might not do anything
 // in others it might copy a buffer and/or do other
 // synchronizing tasks
 
+
 int (* Gi_events) (int *d) ;
 
 int (* G_events) (double *d) ;
+
+
 
 // int (* G_resize_window) (int request[2], int actual[2]) ;
 // request[0] = desired width
@@ -1602,22 +1869,27 @@ int (* G_events) (double *d) ;
 // removed July 28, 2022 seemed unused and underlying
 // X subroutine was problematic under some versions of the server
 
+
 int (* G_change_pen_dimensions) (double w, double h) ;
 // return 0 if illegal w,h specified, otherwise 1
+
 
 int (* Gi_get_current_window_dimensions) (int *dimentsions) ;
 // return 1 if successful
 // needs to be passed an array of two ints
 
+
 int (* G_get_current_window_dimensions) (double *dimentsions) ;
 // return 1 if successful
 // needs to be passed an array of two doubles
+
 
 int (* Gi_rgb) (int r, int g, int b) ;
 // assumes r,g,b are ints in [0,255]
 
 int (* G_rgb) (double r, double g, double b) ;
 // assumes r,g,b are doubles in [0, 1]
+
 
 /////////////////////////////////////////////////////////////////////
 // Xx next batch are based on the ability to repeatedly
@@ -1627,6 +1899,7 @@ int (* G_rgb) (double r, double g, double b) ;
 int (* G_pixel) (double x, double y) ;
 // return 1 always
 // This is not guaranteed to be safe
+
 
 int (* G_point) (double x, double y) ;
 // return 1 always
@@ -1646,6 +1919,7 @@ int (* G_unclipped_line) (double ixs, double iys, double ixe, double iye) ;
 // but because it is unclipped, this code could waste a great
 // deal of time trying to plot lots of points outside the window.
 
+
 int (* G_line) (double ixs, double iys, double ixe, double iye) ;
 // return 0 if line clipped away entirely, else return 1
 // This is SAFE.
@@ -1656,6 +1930,7 @@ int (* G_line) (double ixs, double iys, double ixe, double iye) ;
 // of G_point that will actually plot a thick point, keeps the
 // entire code safe.
 
+
 int (* Gi_polygon) (int *x, int *y, int numpts) ; 
 // return 1 always
 // capable of drawing a polygon with thick outline
@@ -1665,38 +1940,48 @@ int (* G_polygon) (double *x, double *y, double numpts) ;
 // return 1 always
 // capable of drawing a polygon with thick outline
 
+
 int (* G_triangle) (double x0, double y0, double x1, double y1, double x2, double y2) ; 
 // return value it inherits from G_polygon
 // capable of drawing a triangle with thick outline
 
+
 int (* G_rectangle) (double xleft, double yleft, double width, double height) ; 
 // return value it inherits from G_polygon
 // capable of drawing a rectangle with thick outline
+
+
 
 /////////////////////////////////////////////////////////////////////
 // This batch are based on the ability to repeatedly
 // draw single pixel horizontal lines
 /////////////////////////////////////////////////////////////////////
 
+
 int (* G_single_pixel_horizontal_line) (double x0, double x1, double y) ;
 // return 1 always
 // This is not guaranteed to be safe
 
+
 int (* G_clear) () ; 
 // return 1 always
+
 
 int (* G_fill_circle) (double a, double b, double r) ;
 // always return 1
 
+
 int (* G_unclipped_fill_polygon) (double *xx, double *yy, double n) ;
 // return 0 if size needs to be truncated (unusual), else 1 
 // This is SAFE
+
 
 int (* Gi_fill_polygon) (int *xx, int *yy, int n) ;
 // return 0 if size needs to be truncated (unusual), 
 // or if clipping is used,  otherwise return 1
 // This is SAFE
 // AND it clips
+
 
 int (* G_fill_polygon) (double *xx, double *yy, double n) ;
 // provided as an alternative for passing arrays of doubles
@@ -1705,14 +1990,22 @@ int (* G_fill_polygon) (double *xx, double *yy, double n) ;
 // This is SAFE
 // AND it clips
 
+
 int (* G_fill_triangle) (double x0, double y0, double x1, double y1, double x2, double y2) ; 
 // return value it inherits from G_fill_polygon
+
 
 int (* G_fill_rectangle) (double xleft, double yleft, double width, double height) ;
 // return value it inherits from G_fill_polygon
 
+
 int (* G_font_pixel_height) () ;
 // return the font height in pixels
+
+
+
+
+
 
 // the void * pointers below allow for passing in 
 // either an array of characters (usual usage)
@@ -1727,6 +2020,7 @@ int (* G_draw_string) (const void *one_line_of_text, double LLx, double LLy) ;
 // the coordinates of the lower left corner of the bounding box
 // of the text
 
+
 int (* G_draw_text) (
                int num_lines_of_text,
                const void  *lines_of_text, // an array of pointers
@@ -1737,11 +2031,14 @@ int (* G_draw_text) (
                double extra_space_between_letters_fraction,
                double extra_space_between_lines_fraction) ;
 
+
 int (* G_save_image_to_file) (const void *filename) ;
 // return 1 if successful, else 0
 
 int (* G_get_image_from_file) (const void *filename, double x, double y) ;
 // return 1 if successful, else 0
+
+
 
 int (* G_get_pixel) (double x, double y) ;
 // return the 32 bit pixel value...assumes x,y are legal
@@ -1758,6 +2055,8 @@ int (* G_convert_rgbI_to_rgb) (int rgbI[3], double rgb[3]) ;
 // convert rgbI[] in 0-255 to rgb[] in 0.0 - 1.0
 // return 1 if successful, else 0
 
+
+
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
@@ -1765,6 +2064,7 @@ int (* G_convert_rgbI_to_rgb) (int rgbI[3], double rgb[3]) ;
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
+
 
 int  G_init_graphics (double w, double h)
 // G_init_graphics has the task of connecting this interface
@@ -1853,12 +2153,15 @@ int  G_init_graphics (double w, double h)
  return s ;
 }
 
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
+
 
 // The following functions are built on top of G
 // not directly on top of the underlying
 // video system
+
 
 int Gi_wait_click(int p[2])
 {
@@ -1872,6 +2175,8 @@ int Gi_wait_click(int p[2])
   return sig ;
 }
 
+
+
 int G_wait_click(double p[2])
 {
   int sig ;
@@ -1883,6 +2188,8 @@ int G_wait_click(double p[2])
   
   return sig ;
 }
+
+
 
 int G_wait_key()
 {
@@ -1897,6 +2204,9 @@ int G_wait_key()
   return sig ;
 }
 
+
+
+
 int G_no_wait_key()
 // if key has been hit, return non-negative (ascii) value
 // return negative if key has NOT been hit  (some other action or no action)
@@ -1907,10 +2217,21 @@ int G_no_wait_key()
   return sig ;
 }
 
+
+
+
+
+
+
+
+
+
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
 // Added Aug 28, 2012
+
+
 
 static int sector(double xcenter, double ycenter, double radius, 
                   double start_radians, double end_radians,
@@ -1951,6 +2272,8 @@ static int sector(double xcenter, double ycenter, double radius,
   return j ;
 }
 
+
+
 int G_sector(double xcenter, double ycenter, double radius, 
              double start_radians, double end_radians)
 {
@@ -1972,6 +2295,9 @@ int G_sector(double xcenter, double ycenter, double radius,
 
   return 1 ;
 }
+
+
+
 
 int G_fill_sector(double xcenter, double ycenter, double radius, 
                   double start_radians, double end_radians)
@@ -1995,9 +2321,12 @@ int G_fill_sector(double xcenter, double ycenter, double radius,
   return 1 ;
 }
 
+
+
 /////////////////////////////////////////////////////////////////
 
 static double mouse_values[2] ;
+
 
 int G_wait_mouse()
 // save off mouse click in reserved variables
@@ -2006,11 +2335,15 @@ int G_wait_mouse()
   return 1 ;  
 }
 
+
+
 double G_x_mouse()
 // return x coordinate of last G_wait_mouse
 {
   return mouse_values[0] ;
 }
+
+
 
 double G_y_mouse()
 // return y coordinate of last G_wait_mouse
@@ -2018,8 +2351,12 @@ double G_y_mouse()
   return mouse_values[1] ;
 }
 
+
+
+
 //====================================================================
 // Time :  
+
 
 int get_timeI (int *hms)
 // hms had better be at least 3 ints long
@@ -2049,6 +2386,9 @@ int get_timeI (int *hms)
 
 }
 
+
+
+
 int get_timeD (double *hms)
 // hms had better be at least 3 doubles long
 // returns 1 for success, 0 for failure
@@ -2067,6 +2407,8 @@ int get_timeD (double *hms)
  return s ;
 }
 
+
+
 int get_time (double *hms)
 // synonym for get_timeD
 {
@@ -2074,6 +2416,7 @@ int get_time (double *hms)
   s = get_timeD(hms) ;
   return s ;
 }
+
 
 int G_get_time (double *hms)
 // another synonym for get_timeD
@@ -2083,9 +2426,15 @@ int G_get_time (double *hms)
   return s ;
 }
 
+
+
+
 /////////////////////////////////////////////////////////////////
 // bmp file support
 /////////////////////////////////////////////////////////////////
+
+
+
 
 static unsigned char bmp_header[54] = {
 0x42,0x4D,
@@ -2105,6 +2454,9 @@ static unsigned char bmp_header[54] = {
 0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,
 } ;
+
+
+
 
 static void store_int_as_little_endian (int n, int p)
 {
@@ -2126,6 +2478,7 @@ static void store_int_as_little_endian (int n, int p)
 
 }
 
+
 static int get_int_from_little_endian (int p)
 {
   int a,b,c,d,r ;
@@ -2141,8 +2494,15 @@ static int get_int_from_little_endian (int p)
       ((b <<  8) & 0x0000ff00) |
               (a & 0x000000ff) ;
 
+
   return r ;
 }
+
+
+
+
+
+
 
 int pixel_to_byte_rgb (int pix, char Brgb[3]) 
 // Always return 1
@@ -2153,6 +2513,9 @@ int pixel_to_byte_rgb (int pix, char Brgb[3])
 
   return 1 ;
 }
+
+
+
 
 int G_save_to_bmp_file (char *fname)
 // return 1 if successful, otherwise return 0 
@@ -2166,6 +2529,7 @@ int G_save_to_bmp_file (char *fname)
                       AllPlanes, ZPixmap) ;
   //==================================
 
+
   FILE *f ;
   int s ;
 
@@ -2175,6 +2539,8 @@ int G_save_to_bmp_file (char *fname)
     return 0 ;
   }
 
+
+  
   int bmp_header_size = 54 ;
   int width_of_bitmap_in_pixels = Xx_Pix_width ;
   int height_of_bitmap_in_pixels = Xx_Pix_height ;
@@ -2191,11 +2557,13 @@ int G_save_to_bmp_file (char *fname)
   store_int_as_little_endian (height_of_bitmap_in_pixels,0x16) ;
   store_int_as_little_endian (size_of_raw_bmp_data,0x22) ;
 
+
   // output the bmp_header
   int i,c,x,y,count ;
   for (i = 0 ; i < 54 ; i++) {
     c = bmp_header[i] ;  fputc(c,f) ;
   }
+
 
   // output the color data
   //  Pixel pix ;
@@ -2207,10 +2575,14 @@ int G_save_to_bmp_file (char *fname)
     count = 0 ; 
     for (x = 0 ; x < width_of_bitmap_in_pixels ; x++) {
 
+
+      
       // pix = G_get_pixel(x,y) ;
       // pixel_to_byte_rgb(pix, Brgb) ;
       p = XGetPixel(pxim,x, Xx_Pix_height - 1 - y) ; // X11 stuff
       pixel_to_byte_rgb(p, Brgb) ;
+      
+
 
       c = Brgb[2] ;   fputc(c,f) ; count++ ; // blue first
       c = Brgb[1] ;   fputc(c,f) ; count++ ;
@@ -2222,7 +2594,9 @@ int G_save_to_bmp_file (char *fname)
     }
   }
 
+
   fclose(f) ;
+
 
   //==================================  
   // X11 stuff
@@ -2231,7 +2605,14 @@ int G_save_to_bmp_file (char *fname)
   //==================================  
   
   return 1 ;
+
 }
+
+
+
+
+
+
 
 int get_dimensions_of_bmp_file (char filename[], int dimensions[2])
 // return 0 if failure, else return 1
@@ -2244,6 +2625,7 @@ int get_dimensions_of_bmp_file (char filename[], int dimensions[2])
     return 0 ;
   }
 
+
   int bmp_header_size = 54 ;
   // header should be 54 bytes...read them
   int i,c ;
@@ -2257,15 +2639,23 @@ int get_dimensions_of_bmp_file (char filename[], int dimensions[2])
   if (bmp_header[0] != 0x42) return 0 ;
   if (bmp_header[1] != 0x4D) return 0 ;
 
+
   int size_of_bmp_file = get_int_from_little_endian (0x02) ;
   int width_of_bitmap_in_pixels = get_int_from_little_endian (0x12) ;
   int height_of_bitmap_in_pixels = get_int_from_little_endian (0x16) ;
+
+
   
   dimensions[0] = width_of_bitmap_in_pixels ;
   dimensions[1] = height_of_bitmap_in_pixels ;  
   fclose(f) ;
   return 1 ;
 }
+
+
+
+
+
 
 int G_display_bmp_file (char filename[], int xoffset, int yoffset)
 // return 0 if failure, else return 1  
@@ -2278,6 +2668,9 @@ int G_display_bmp_file (char filename[], int xoffset, int yoffset)
     return 0 ;
   }
 
+
+  
+
   int bmp_header_size = 54 ;
   // header should be 54 bytes...read them
   int i,c ;
@@ -2291,10 +2684,12 @@ int G_display_bmp_file (char filename[], int xoffset, int yoffset)
   if (bmp_header[0] != 0x42) return 0 ;
   if (bmp_header[1] != 0x4D) return 0 ;
 
+
   int size_of_bmp_file = get_int_from_little_endian (0x02) ;
   int width_of_bitmap_in_pixels = get_int_from_little_endian (0x12) ;
   int height_of_bitmap_in_pixels = get_int_from_little_endian (0x16) ;
   int size_of_raw_bmp_data = get_int_from_little_endian (0x22) ;
+
 
   /////////////////////////////////////////////////////////
 
@@ -2314,6 +2709,8 @@ int G_display_bmp_file (char filename[], int xoffset, int yoffset)
     return 0 ;
   }
 
+
+  
   // input the color data
   int y,count,x ;
   unsigned char r,g,b ;
@@ -2336,6 +2733,7 @@ int G_display_bmp_file (char filename[], int xoffset, int yoffset)
       r = (unsigned char) c ;
       count++ ;
 
+
       Gi_rgb(r,g,b) ;
       G_point(x+xoffset,y+yoffset) ;
       
@@ -2356,3 +2754,4 @@ int G_display_bmp_file (char filename[], int xoffset, int yoffset)
 }
 
 #endif
+
