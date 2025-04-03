@@ -25,6 +25,7 @@ int main()
     }
     int key;
     key = G_wait_key();
+    G_save_to_bmp_file("prog1.bmp") ;
 }
 
 /*int main()
