@@ -1,123 +1,180 @@
-#include  "FPToolkit.c"
+#include "FPToolkit.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int main()
-{
-    double swidth, sheight;
+int LEFT = 65361;
+int UP = 65362;
+int RIGHT = 65363;
+int DOWN = 65364;
+double ISO_STEP = 0.025;
 
-    swidth = 800.0; sheight = 800.0;
-    G_init_graphics(swidth, sheight);
-    G_rgb(1.0, 1.0, 1.0);
-    G_clear();
-    int size_num;
-    printf("Type in pos int\n");
-    scanf("%d", &size_num);
-    printf("%d", size_num); 
-    
-    for (double i = 0; i <= size_num; i += 1.0)
-    {
-        G_rgb(0.0, 0.0, 0.0);
-        G_line(swidth*(i/size_num)*1.0, 0.0, swidth*(i/size_num)*1.0, sheight*1.0);
+typedef struct Color {
+    double r;
+    double g;
+    double b;
+} Color;
+
+typedef struct CelestialBody {
+    char name[50];
+    double x;
+    double y;
+    double radius;
+    double orbit_position;
+    double orbit_radius;
+    double rads_per_day;
+    double scale;
+    Color color;
+    struct CelestialBody *satellite;
+    struct CelestialBody *host;
+} CelestialBody;
+
+void updateIso(double *iso_percentage, int direction);
+void updateBody(CelestialBody *body, int direction, double iso_percentage);
+void drawBody(CelestialBody *body);
+void drawSystem(CelestialBody *body);
+void printBody(CelestialBody *body);
+
+int main() {
+    double screen_width, screen_height;
+    double iso_percentage;
+    CelestialBody sun, earth, moon;
+    int keydown;
+    int direction;
+
+    keydown = 0;
+    screen_width = 1000;
+    screen_height = 1000;
+
+    iso_percentage = 0.0;
+
+    strcpy(sun.name, "Sun");
+    sun.x = screen_width / 2;
+    sun.y = screen_height / 2;
+    sun.radius = 100;
+    sun.scale = 1.0;
+    sun.color.r = 243.0 / 255;
+    sun.color.g = 208.0 / 255;
+    sun.color.b = 64.0 / 255;
+    sun.satellite = &earth;
+    sun.host = NULL;
+
+    strcpy(earth.name, "Earth");
+    earth.orbit_radius = 300;
+    earth.orbit_position = 0;
+    earth.radius = 40;
+    earth.rads_per_day = 2 * M_PI / 365;
+    earth.scale = 1.0;
+    earth.color.r = 72.0 / 255;
+    earth.color.g = 132.0 / 255;
+    earth.color.b = 212.0 / 255;
+    earth.satellite = &moon;
+    earth.host = &sun;
+
+    strcpy(moon.name, "Moon");
+    moon.orbit_radius = 75;
+    moon.orbit_position = 0;
+    moon.radius = 20;
+    moon.rads_per_day = 2 * M_PI / 28;
+    moon.scale = 1.0;
+    moon.color.r = 185.0 / 255;
+    moon.color.g = 181.0 / 255;
+    moon.color.b = 195.0 / 255;
+    moon.satellite = NULL;
+    moon.host = &earth;
+    moon.satellite = NULL;
+
+    G_init_graphics(screen_width, screen_height);
+
+    while (keydown != 'q') {
+        G_rgb(0, 0, 0);
+        G_clear();
+
+        // First do the logic
+        updateIso(&iso_percentage, direction);
+        updateBody(&earth, direction, iso_percentage);
+        updateBody(&moon, direction, iso_percentage);
+        drawSystem(&sun);
+        // drawBody(&sun);
+        // drawBody(&earth);
+        // drawBody(&moon);
+
+        keydown = G_wait_key();
+        direction = keydown;
     }
-    for (double i = 0; i <= size_num; i += 1.0)
-    {
-        G_rgb(0.0, 0.0, 0.0);
-        G_line(0.0, sheight*(i/size_num)*1.0, swidth*1.0, sheight*(i/size_num)*1.0);
-    }
-    int key;
-    key = G_wait_key();
+
+    return EXIT_SUCCESS;
 }
 
-/*int main()
-{
-   int    swidth, sheight ;
-   double lowleftx, lowlefty, width, height ;
-   double x[10], y[10] ;
-   double numxy ;
-   double a[20], b[20] ;
-   double numab ;
+void updateIso(double *iso_percentage, int direction) {
+    if (direction == UP) {
+        *iso_percentage += ISO_STEP;
+        if (*iso_percentage > 1.0) {
+            *iso_percentage = 1.0;
+        }
+    } else if (direction == DOWN) {
+        *iso_percentage -= ISO_STEP;
+        if (*iso_percentage < 0.0) {
+            *iso_percentage = 0.0;
+        }
+    }
+}
 
-   
-   // must do this before you do 'almost' any other graphical tasks 
-   swidth = 400 ;  sheight = 600 ;
-   G_init_graphics (swidth,sheight) ;  // interactive graphics
+void updateBody(CelestialBody *body, int direction, double iso_percentage) {
+    if (direction == LEFT) {
+        body->orbit_position -= body->rads_per_day;
+    } else if (direction == RIGHT) {
+        body->orbit_position += body->rads_per_day;
+    }
 
-   
-   // clear the screen in a given color
-   G_rgb (0.3, 0.3, 0.3) ; // dark gray
-   G_clear () ;
+    float scaled_orbit_radius = body->orbit_radius * (body->host->scale);
+    float orbit_radius_y = scaled_orbit_radius * (1.0 - iso_percentage);
+    float x_offset = cos(body->orbit_position);
+    float y_offset = sin(body->orbit_position);
 
-   
-   // draw a point
-   G_rgb (1.0, 0.0, 0.0) ; // red
-   G_point (200, 580) ; // hard to see
+    body->orbit_position = fmod(body->orbit_position, 2 * M_PI);
 
-   
-   // draw a line
-   G_rgb (0.0, 1.0, 0.0) ; // green
-   G_line (0,0, swidth-1, sheight-1) ;
+    body->x = body->host->x + scaled_orbit_radius * x_offset;
+    body->y = body->host->y + orbit_radius_y * y_offset;
 
-   
-   // aligned rectangles
-   G_rgb (0.0, 0.0, 1.0) ; // blue
-   lowleftx = 200 ; lowlefty = 50 ; width = 10 ; height = 30 ;
-   G_rectangle (lowleftx, lowlefty, width, height) ;
-   lowleftx = 250 ; 
-   G_fill_rectangle (lowleftx, lowlefty, width, height) ;
+    body->scale = 1.0 - (0.25 * iso_percentage * y_offset);
+}
 
-   
-   // triangles
-   G_rgb (1.0, 1.0, 0.0) ; // yellow
-   G_triangle (10, 300,  40,300,  60,250) ;
-   G_fill_triangle (10,100,  40,100,  60,150) ;
+void drawBody(CelestialBody *body) {
+    float host_scale = 1.0;
 
-   
-   // circles   
-   G_rgb (1.0, 0.5, 0.0) ; // orange
-   G_circle (100, 300, 75) ;
-   G_fill_circle (370, 200, 50) ;
+    if (body->host != NULL) {
+        host_scale = body->host->scale;
+    }
 
-   
-   // polygons
-   G_rgb (0.0, 0.0, 0.0) ; // black
-   x[0] = 100 ;   y[0] = 100 ;
-   x[1] = 100 ;   y[1] = 300 ;
-   x[2] = 300 ;   y[2] = 300 ;
-   x[3] = 300 ;   y[3] = 100 ;
-   x[4] = 200 ;   y[4] = 175 ;
-   numxy = 5 ;
-   G_polygon (x,y,numxy) ;
+    G_rgb(body->color.r, body->color.g, body->color.b);
+    G_fill_circle(body->x, body->y, body->radius * body->scale * host_scale);
+}
 
+void drawSystem(CelestialBody *body) {
+    // If the satellite position is within the range of "pi" draw the satellite.
+    // else draw the host first
+    if (body->satellite == NULL) {
+        drawBody(body);
+        return;
+    }
 
-   G_rgb (0.4, 0.2, 0.1) ; // brown
-   a[0] = 300 ;   b[0] = 400 ;
-   a[1] = 350 ;   b[1] = 450 ;
-   a[2] = 275 ;   b[2] = 500 ;
-   a[3] = 125 ;   b[3] = 400 ;
-   numab = 4 ;
-   G_fill_polygon (a,b,numab) ;
+    if (body->satellite->orbit_position < M_PI) {
+        drawSystem(body->satellite);
+        drawBody(body);
+    } else {
+        drawBody(body);
+        drawSystem(body->satellite);
+    }
+}
 
-
-
-   //===============================================
-   
-   double p[2], q[2] ;
-
-   G_rgb(1,0,0) ;
-   
-   G_wait_click(p) ;
-   G_fill_circle(p[0],p[1],2) ;
-
-   G_wait_click(q) ;
-   G_fill_circle(q[0],q[1],2) ;   
-
-   G_rgb(0,1,0.5) ;
-   G_line(p[0],p[1], q[0],q[1]) ;
-   
-   int key ;   
-   key =  G_wait_key() ; // pause so user can see results
-   
-   //printf("%d", &key);
-
-   //G_save_image_to_file("demo.xwd") ;
-   G_save_to_bmp_file("demo.bmp") ;
-}*/
+void printBody(CelestialBody *body) {
+    printf("Name: %s\n", body->name);
+    printf("X: %f\n", body->x);
+    printf("Y: %f\n", body->y);
+    printf("Orbit Position: %f\n", body->orbit_position);
+    printf("Orbit Radius: %f\n", body->orbit_radius);
+    printf("Rads per Day: %f\n", body->rads_per_day);
+    printf("Rel y: %f\n", sin(body->orbit_position));
+    printf("\n");
+}
