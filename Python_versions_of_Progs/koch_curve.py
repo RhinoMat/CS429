@@ -1,7 +1,6 @@
 from ctypes import *
 from Gkit import *
 from math import *
-from random import *
 def main():
     swidth = 800
     sheight = 800
