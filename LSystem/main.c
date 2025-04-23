@@ -14,7 +14,6 @@ typedef struct Production {
 int find_rule(char s);
 void string_builder();
 void string_interpreter();
-
 void square_wave();
 void sierpinski();
 
@@ -38,6 +37,7 @@ int main(void) {
     G_init_graphics(SCREEN_WIDTH, SCREEN_HEIGHT);
     square_wave();
     //  plant() ;
+    sierpinski();
     string_builder();
     string_interpreter();
 
