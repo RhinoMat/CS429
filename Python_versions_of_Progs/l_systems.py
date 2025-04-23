@@ -70,7 +70,7 @@ def string_builder():
         print("\n")  # Add a newline for readability
 
 
-'''def autoplacer(swidth, sheight, p):
+def autoplacer(swidth, sheight, p):
     """
     Automatically places points within the given screen width and height.
     Adjusts the scaling factor and offsets to fit the points on the screen.
@@ -103,7 +103,7 @@ def string_builder():
     for i in range(len(p)):
         x, y = p[i]
         p[i] = (x * scale + offset_x, y * scale + offset_y)
-'''
+
 
 def string_interpreter():
     global u, flen, gangle
@@ -115,7 +115,8 @@ def string_interpreter():
     G_rgb(1, 1, 1)  # Set drawing color to white
 
     # Starting position
-    x, y = 400, 400
+    #x, y = 400, 400
+    x, y = 10, 10
     angle = 90  # Initial angle
     stack = []  # Stack to store position and angle for '[' and ']'
 
@@ -133,14 +134,15 @@ def string_interpreter():
             stack.append((x, y, angle))
         elif char == ']':  # Restore the last saved state
             x, y, angle = stack.pop()
-
+    #autoplacer(800, 800, stack)
     G_display_image()  # Display the final image
     G_wait_key()  # Wait for user input before closing
 def main():
     global flen, gangle, depth
-    flen = 10
+    flen = 50
     gangle = 90
     depth = int(input("Please specify the level of depth for the l-system: "))
+    square_wave()
     square_wave()
     string_builder()
     print("Generated L-System String:", u)  # Debug: Print the generated string
