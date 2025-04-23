@@ -1,4 +1,22 @@
-#include "main.h"
+#include "FPToolkit.c"
+#define SCREEN_WIDTH 1000
+#define SCREEN_HEIGHT 1000
+typedef struct Point {
+    double x;
+    double y;
+} Point;
+typedef struct Production {
+    char var;
+    char axiom[100];
+    char rule[100];
+} Production;
+
+int find_rule(char s);
+void string_builder();
+void string_interpreter();
+
+void square_wave();
+void sierpinski();
 
 Production prd[10];
 int rule_num = 0;
@@ -10,7 +28,7 @@ Point TURTLE;
 
 double START_ANGLE = 0.5 * M_PI;
 double DELTA_ANGLE = 0.5 * M_PI;
-double FORWARD_LENGTH = 10;
+double FORWARD_LENGTH = 50;
 
 int main(void) {
     int keydown = 0;
@@ -18,8 +36,6 @@ int main(void) {
     scanf("%d", &depth);
 
     G_init_graphics(SCREEN_WIDTH, SCREEN_HEIGHT);
-    //U_set_color_hex(SM32_BLACK);
-    G_rgb(0,0,0);
     square_wave();
     //  plant() ;
     string_builder();
@@ -146,13 +162,16 @@ void autoplacer(int swidth, int sheight, double *p) {
 void string_interpreter() {
     double angle = START_ANGLE;
     char cur;
-
+    G_rgb(0.0, 0.0, 0.0);
+    G_clear();
+    G_rgb(1.0, 1.0, 1.0);
     for (int i = 0; i < strlen(u); i++) {
         cur = u[i];
         if (cur == 'f') {
             Point temp_turtle;
             temp_turtle.x = TURTLE.x + FORWARD_LENGTH * cos(angle);
             temp_turtle.y = TURTLE.y + FORWARD_LENGTH * sin(angle);
+            
             G_line(TURTLE.x, TURTLE.y, temp_turtle.x, temp_turtle.y);
             TURTLE.x = temp_turtle.x;
             TURTLE.y = temp_turtle.y;
