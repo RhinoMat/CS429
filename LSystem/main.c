@@ -35,7 +35,7 @@ int main(void) {
     scanf("%d", &depth);
 
     G_init_graphics(SCREEN_WIDTH, SCREEN_HEIGHT);
-    square_wave();
+    //square_wave();
     //  plant() ;
     sierpinski();
     string_builder();
@@ -70,6 +70,7 @@ void sierpinski() {
     prd[rule_num].var = 'A';
     strcpy(prd[rule_num].rule, "B-f-B");
     rule_num++;
+
     prd[rule_num].var = 'B';
     strcpy(prd[rule_num].rule, "A+f+A");
     rule_num++;
