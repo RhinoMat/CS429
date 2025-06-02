@@ -26,40 +26,40 @@ void rotate(double theta)
 }
 void initials(double r_f)
 {
-    if (r_f < 0.1) { 
+    if (r_f < 0.1 && r_f >= 0.0) { 
         scale(0.5, 0.5);
         translate(0.0, 0.5);
     }
-    else if (r_f < 0.2) {
+    else if (r_f < 0.2 && r_f >= 0.1) {
         scale(0.5, 0.5);
         translate(0.0, 0.75);
     }
-    else if (r_f < 0.3) {
+    else if (r_f < 0.3 && r_f >= 0.2) {
         scale(0.5, 0.5);
         rotate(45);
         translate(0.0, 0.0);
     }
-    else if (r_f < 0.4) {
+    else if (r_f < 0.4 && r_f >= 0.3) {
         scale(0.5, 0.5);
         translate(0.5, 0.5);
     }
-    else if (r_f < 0.5) {
+    else if (r_f < 0.5 && r_f >= 0.4) {
         scale(0.5, 0.5);
         translate(0.5, 0.75);
     }
-    else if (r_f < 0.6) { 
+    else if (r_f < 0.6 && r_f >= 0.5) { 
         scale(0.5, 0.5);
         translate(0.5, 0.625);
     }
-    else if (r_f < 0.7) { 
+    else if (r_f < 0.7 && r_f >= 0.6) { 
         scale(0.5, 0.5);
         translate(0.5, 0.5);
     }
-    else if (r_f < 0.8) { 
+    else if (r_f < 0.8 && r_f >= 0.7) { 
         scale(0.5, 0.5);
         translate(0.75, 0.5);
     }
-    else if (r_f < 0.9) { 
+    else if (r_f < 0.9 && r_f >= 0.8) { 
         scale(0.5, 0.5);
         translate(0.875, 0.5);
     }
