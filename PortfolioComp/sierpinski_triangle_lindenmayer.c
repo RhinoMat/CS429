@@ -11,6 +11,8 @@ char temp[1000000];
 char s[10];
 char w[10][1000];
 int n = 0; // n = # rules in Grammar
+char fname[200];
+int count = 0;
 void function (int depth)
 {
   if (depth == 0)
@@ -51,13 +53,13 @@ void color(int i)
       G_rgb(1, 0, 0);
       break;
     case 1:
-      G_rgb(0, 0.5, 0.15);
+      G_rgb(0, 1, 0);
       break;
     case 2:
-      G_rgb(1, 0.84, 0);
+      G_rgb(0.5, 0, 0.5);
       break;
     case 3:
-      G_rgb(1, 1, 0);
+      G_rgb(0.75, 0.25, 0.5);
       break;
     default:
       break;
@@ -135,8 +137,14 @@ int main() {
       continue;
     }
   }
+  count++;
   int key;
   key = G_wait_key();
+  if (key == 'q')
+  {
+    sprintf(fname, "simple%04d.bmp", count);
+    G_save_to_bmp_file(fname);
+  }
   }
   int key;
   key = G_wait_key();
