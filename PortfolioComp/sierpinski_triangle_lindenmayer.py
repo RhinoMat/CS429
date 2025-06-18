@@ -1,5 +1,6 @@
 from Gkit import *
 from math import *
+from colorsys import hsv_to_rgb
 
 def lsystem_expand(axiom, rules, depth):
     result = axiom
@@ -10,19 +11,17 @@ def lsystem_expand(axiom, rules, depth):
         result = next_result
     return result
 
-def color(i):
-    if i % 3 == 0:
-        G_rgb(1, 0, 0)
-    elif i % 3 == 1:
-        G_rgb(0, 1, 0)
-    elif i % 3 == 2:
-        G_rgb(0.5, 0, 0.5)
+def color(i, total):
+    t = i / total
+    r, g, b = hsv_to_rgb(t, 1, 1)
+    G_rgb(r, g, b)
 
 def draw_lsystem(instructions, angle, step, start_pos, start_angle):
     x, y = start_pos
     theta = start_angle
+    total = len(instructions)
     for i, cmd in enumerate(instructions):
-        color(i)
+        color(i, total)
         if cmd == '+':
             theta += angle
         elif cmd == '-':
@@ -34,7 +33,7 @@ def draw_lsystem(instructions, angle, step, start_pos, start_angle):
             x, y = new_x, new_y
 
 def main():
-    swidth, sheight = 800, 700
+    swidth, sheight = 800, 800
     G_init_graphics(swidth, sheight)
     axiom = "A"
     rules = {'A': "B-A-B", 'B': "A+B+A"}
@@ -47,7 +46,7 @@ def main():
     deg = 58
     count = 0
     while True:
-        G_rgb(0, 0, 0)
+        G_rgb(34/255, 34/255, 34/255)
         G_clear()
         angle = deg * pi / 180  # convert to radians
         draw_lsystem(instructions, angle, step, start_pos, start_angle)
@@ -55,9 +54,9 @@ def main():
         if key == ord('q'):
             fname = f"stl{count:04d}.bmp"
             G_save_to_bmp_file(fname)
-            #break
-        deg += 2
-        count += 1
+        else:
+            deg += 2
+            count += 1
 
 if __name__ == "__main__":
     main()
