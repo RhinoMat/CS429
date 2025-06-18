@@ -5,8 +5,8 @@ from random import *
 from colorsys import hsv_to_rgb
 import time
 
-WIDTH = 400
-HEIGHT = 400
+WIDTH = 800
+HEIGHT = 800
 
 x : float = 0.0
 y : float = 0.0
@@ -50,58 +50,50 @@ def fern(r_f : float):
         rotate(61.9275); # atan2(0.28, -0.15) in degrees
         translate(0.0, 0.44)
 
-'''def main():
-    G_init_graphics(WIDTH, HEIGHT)
-    G_rgb(0.0, 0.0, 0.0)
-    G_clear()
-    G_rgb(0.0, 1.0, 0.0) # Green fern
-    for k in range(0, 200000):
+def draw_fern(center_x, center_y, scale_factor, frame_count, shift):
+    global x, y
+    x, y = 0.0, 0.0
+    for k in range(0, 50000):
         r_f = random()
         fern(r_f)
-        plot_x : float = (x + 2.1820) / (2.6558 + 2.1820) * WIDTH
+        # Fern "waving" effect: horizontal shift increases with y
+        flap_amplitude = 1.0  # Increase for more dramatic waving
+        flap_speed = 0.04     # Adjust for faster/slower waving
+        flap = flap_amplitude * (y / 9.9983) * sin(flap_speed * frame_count)
+        # Apply scaling and translation
+        plot_x = ((x + flap + 2.1820 + shift) % (2.6558 + 2.1820)) / (2.6558 + 2.1820) * WIDTH
         plot_x = WIDTH - plot_x
         plot_y = (y / 9.9983 * HEIGHT)
-        G_rgb(0.0 + k/200000, 1.0, 0.0)
+        # Scale and translate
+        plot_x = (plot_x - WIDTH/2) * scale_factor + center_x
+        plot_y = (plot_y - HEIGHT/2) * scale_factor + center_y
+        hue = ((k / 50000) + (frame_count * 0.01)) % 1.0
+        r, g, b = hsv_to_rgb(hue, 1.0, 1.0)
+        G_rgb(r, g, b)
         G_point(plot_x, plot_y)
-    G_save_to_bmp_file("FERN.bmp")'''
+
 def main():
     G_init_graphics(WIDTH, HEIGHT)
     frame_count = 0
     shift = 0.0
     screenshot_count = 0
     while True:
-        #G_rgb(0.0, 0.0, 0.0)
         G_rgb(141/255,183/255,193/255)
         G_clear()
-        global x, y
-        x, y = 0.0, 0.0
-        for k in range(0, 50000):
-            r_f = random()
-            fern(r_f)
-            # Fern "waving" effect: horizontal shift increases with y
-            flap_amplitude = 1.0  # Increase for more dramatic waving
-            flap_speed = 0.04     # Adjust for faster/slower waving
-            # The higher the y, the more it moves left/right
-            flap = flap_amplitude * (y / 9.9983) * sin(flap_speed * frame_count)
-            plot_x = ((x + flap + 2.1820 + shift) % (2.6558 + 2.1820)) / (2.6558 + 2.1820) * WIDTH
-            plot_x = WIDTH - plot_x
-            plot_y = (y / 9.9983 * HEIGHT)
-            hue = ((k / 50000) + (frame_count * 0.01)) % 1.0
-            r, g, b = hsv_to_rgb(hue, 1.0, 1.0)
-            G_rgb(r, g, b)
-            G_point(plot_x, plot_y)
-        G_display_image()  # If your Gkit supports this, otherwise remove
+        # Main fern (center)
+        draw_fern(WIDTH//2 + shift, HEIGHT//2, 1.0, frame_count, shift)
+        # Left small fern
+        draw_fern(WIDTH//4 + shift, HEIGHT//4, 0.5, frame_count, shift)
+        # Right small fern
+        draw_fern(3*WIDTH//4 + shift, HEIGHT//4, 0.5, frame_count, shift)
+        G_display_image()
         shift += 0.01
         frame_count += 1
-        key = G_wait_key()  # Non-blocking key check (replace with your Gkit's function)
-        if key == ord('q'):
-            filename = f"FERN_{screenshot_count}.bmp"
-            G_save_to_bmp_file(filename)
-            screenshot_count += 1
-            print(f"Screenshot saved as {filename}")
-        else:
-            time.sleep(0.003)  # Adjust for desired speed
-
+        filename = f"Fern_screenshots/FERN_{screenshot_count}.bmp"
+        G_save_to_bmp_file(filename)
+        screenshot_count += 1
+        print(f"Screenshot saved as {filename}")
+        time.sleep(0.0003)
 
 if __name__ == "__main__":
     main()
